@@ -12,7 +12,8 @@ import {
   Download,
   LogOut,
   User,
-  Settings
+  Settings,
+  FileText
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -47,6 +48,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'budget', label: '4. Budget', icon: Wallet, desc: '예산 및 기준 관리' },
     { id: 'raw_sap', label: '5. Raw_SAP', icon: Database, desc: 'SAP 원본 데이터 입력소' },
     { id: 'mapping', label: '6. Mapping', icon: FileSpreadsheet, desc: '계정과목 매핑 기준' },
+    { id: 'memo', label: '7. Memo', icon: FileText, desc: '연구원 비밀 메모장' },
   ];
 
   return (

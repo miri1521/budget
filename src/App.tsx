@@ -8,6 +8,7 @@ import { TrendView } from './components/TrendView';
 import { BudgetView } from './components/BudgetView';
 import { RawSapView } from './components/RawSapView';
 import { MappingView } from './components/MappingView';
+import { MemoView } from './components/MemoView';
 import { AiInsightsModal } from './components/AiInsightsModal';
 import { AuthView } from './components/AuthView';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
@@ -170,6 +171,11 @@ export default function App() {
           <MappingView
             mappings={mappings}
             setMappings={setMappings}
+          />
+        )}
+        {activeSheet === 'memo' && (
+          <MemoView
+            user={user}
           />
         )}
       </main>

@@ -51,4 +51,15 @@ export type ActiveSheet =
   | 'trend' 
   | 'budget' 
   | 'raw_sap' 
-  | 'mapping';
+  | 'mapping'
+  | 'memo';
+
+export interface MemoItem {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  department?: string;
+  category?: string;
+  created_at: string;
+}
