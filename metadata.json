@@ -1,0 +1,7 @@
+{
+  "name": "연구소 경상비용 분석 템플릿",
+  "description": "연구소 부서별(5개 프로젝트 + 3개 지원 조직) 경상비용 분석 및 예산 대비 진척률, YoY 증감 모니터링 엑셀 스타일 템플릿",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
