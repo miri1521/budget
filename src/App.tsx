@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActiveSheet, SapTransaction, BudgetEntry, AccountMapping } from './types';
 import { generateInitialTransactions, generateInitialBudgets, INITIAL_MAPPINGS } from './data/initialData';
 import { Navbar } from './components/Navbar';
@@ -9,8 +9,15 @@ import { BudgetView } from './components/BudgetView';
 import { RawSapView } from './components/RawSapView';
 import { MappingView } from './components/MappingView';
 import { AiInsightsModal } from './components/AiInsightsModal';
+import { AuthView } from './components/AuthView';
+import { SupabaseConfigModal } from './components/SupabaseConfigModal';
+import { getSupabaseClient } from './lib/supabase';
 
 export default function App() {
+  const [user, setUser] = useState<{ email: string; id: string } | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>('dashboard');
   const [selectedYear, setSelectedYear] = useState<number>(2026);
 
@@ -19,6 +26,49 @@ export default function App() {
   const [mappings, setMappings] = useState<AccountMapping[]>(INITIAL_MAPPINGS);
 
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  // Check Supabase auth session on mount
+  useEffect(() => {
+    const client = getSupabaseClient();
+    if (client) {
+      client.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser({
+            email: session.user.email || 'user@institute.re.kr',
+            id: session.user.id
+          });
+        }
+        setAuthChecked(true);
+      }).catch(() => {
+        setAuthChecked(true);
+      });
+
+      const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          setUser({
+            email: session.user.email || 'user@institute.re.kr',
+            id: session.user.id
+          });
+        } else {
+          setUser(null);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    } else {
+      setAuthChecked(true);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    const client = getSupabaseClient();
+    if (client) {
+      await client.auth.signOut();
+    }
+    setUser(null);
+  };
 
   const handleResetData = () => {
     if (window.confirm('모든 SAP 원본 데이터와 예산 설정이 초기 샘플 상태로 리셋됩니다. 진행하시겠습니까?')) {
@@ -54,6 +104,15 @@ export default function App() {
     document.body.removeChild(link);
   };
 
+  // If not logged in, show AuthView
+  if (!user) {
+    return (
+      <AuthView
+        onLoginSuccess={(userData) => setUser(userData)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900">
       {/* Navigation & Sheet Header */}
@@ -65,6 +124,9 @@ export default function App() {
         onResetData={handleResetData}
         onOpenAiModal={() => setIsAiModalOpen(true)}
         onExportCsv={handleExportCsv}
+        user={user}
+        onLogout={handleLogout}
+        onOpenConfig={() => setIsConfigModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -119,6 +181,13 @@ export default function App() {
         transactions={transactions}
         budgets={budgets}
         selectedYear={selectedYear}
+      />
+
+      {/* Supabase Config Modal */}
+      <SupabaseConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => setIsConfigModalOpen(false)}
+        onConfigSaved={() => {}}
       />
     </div>
   );

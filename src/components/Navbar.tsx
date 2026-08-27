@@ -9,7 +9,10 @@ import {
   FileSpreadsheet, 
   Sparkles, 
   RotateCcw,
-  Download
+  Download,
+  LogOut,
+  User,
+  Settings
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -20,6 +23,9 @@ interface NavbarProps {
   onResetData: () => void;
   onOpenAiModal: () => void;
   onExportCsv: () => void;
+  user: { email: string; id: string } | null;
+  onLogout: () => void;
+  onOpenConfig: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -29,7 +35,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   setSelectedYear,
   onResetData,
   onOpenAiModal,
-  onExportCsv
+  onExportCsv,
+  user,
+  onLogout,
+  onOpenConfig
 }) => {
   const tabs = [
     { id: 'dashboard', label: '1. Dashboard', icon: LayoutDashboard, desc: '경영진 요약 대시보드' },
@@ -51,14 +60,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-white">연구소 경상비용 분석 템플릿</h1>
-              <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">M365 Excel 표준</span>
+              <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Supabase Auth 연동</span>
             </div>
             <p className="text-xs text-slate-400">Research Institute Operating Expenses Analysis & Monitoring System</p>
           </div>
         </div>
 
         {/* Global Controls & Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 flex-wrap">
           {/* Year Selector */}
           <div className="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700 text-xs">
             <span className="px-2 text-slate-400 font-medium">분석 연도:</span>
@@ -66,13 +75,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setSelectedYear(2025)}
               className={`px-3 py-1 rounded-md transition ${selectedYear === 2025 ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-300 hover:text-white'}`}
             >
-              2025년 (전년)
+              2025년
             </button>
             <button
               onClick={() => setSelectedYear(2026)}
               className={`px-3 py-1 rounded-md transition ${selectedYear === 2026 ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-300 hover:text-white'}`}
             >
-              2026년 (당해)
+              2026년
             </button>
           </div>
 
@@ -104,6 +113,34 @@ export const Navbar: React.FC<NavbarProps> = ({
             <RotateCcw className="w-3.5 h-3.5" />
             <span>초기화</span>
           </button>
+
+          {/* Supabase Config Button */}
+          <button
+            onClick={onOpenConfig}
+            title="Supabase 설정"
+            className="flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition"
+          >
+            <Settings className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Supabase 설정</span>
+          </button>
+
+          {/* User Profile & Logout */}
+          {user && (
+            <div className="flex items-center space-x-2 pl-2 border-l border-slate-700">
+              <div className="flex items-center space-x-1 text-xs text-slate-300 bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <User className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="font-mono max-w-[120px] truncate">{user.email}</span>
+              </div>
+              <button
+                onClick={onLogout}
+                title="로그아웃"
+                className="flex items-center space-x-1 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-500/30 transition"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>로그아웃</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
